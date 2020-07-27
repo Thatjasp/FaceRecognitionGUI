@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.effect.Glow?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.GUIController">
+   <center>
+      <ImageView id="currentFrame" fx:id="currentFrame" fitHeight="258.0" fitWidth="299.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+   </center>
+   <bottom>
+      <ButtonBar prefHeight="40.0" prefWidth="200.0">
+         <buttons>
+            <Button id="start_btn" fx:id="start_btn" disable="true" mnemonicParsing="false" onAction="#startCamera" text="Start Camera" translateX="-200.0" />
+            <Button fx:id="end_btn" mnemonicParsing="false" onAction="#endCamera" text="End" translateX="-200.0" />
+         </buttons>
+      </ButtonBar>
+   </bottom>
+   <right>
+      <ImageView fx:id="histogram" fitHeight="180.0" fitWidth="200.0" onDragDetected="#histogram" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+   </right>
+   <top>
+      <ToolBar cache="true" nodeOrientation="LEFT_TO_RIGHT" BorderPane.alignment="CENTER">
+         <items>
+            <CheckBox fx:id="greyScale" alignment="CENTER" disable="true" mnemonicParsing="false" onAction="#greyBox" text="Grey Scale" />
+            <CheckBox fx:id="logoBox" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#loadLogo" text="Logo Box" />
+            <CheckBox fx:id="EyeTrack" mnemonicParsing="false" onAction="#eyeReckingBox" text="Face Recognition" />
+         </items>
+         <effect>
+            <Glow level="0.18" />
+         </effect>
+      </ToolBar>
+   </top>
+</BorderPane>
