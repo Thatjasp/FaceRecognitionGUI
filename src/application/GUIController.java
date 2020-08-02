@@ -258,33 +258,14 @@ public class GUIController {
 	@FXML
 	public void histogram() {
 
-		Core.split(frame, histBins);
-		if (histBins.size() > 0) {
-			Imgproc.calcHist(histBins, new MatOfInt(0), new Mat(), bHistory, new MatOfInt(histSize), histRange, false);
-
-			if (!gray) {
-
-				Imgproc.calcHist(histBins, new MatOfInt(1), new Mat(), gHistory, new MatOfInt(histSize), histRange,
-						false);
-
-				Imgproc.calcHist(histBins, new MatOfInt(2), new Mat(), rHistory, new MatOfInt(histSize), histRange,
-						false);
-			}
-		}
+		splitHistory();
 
 		int binWidth = (int) Math.round((double) widthOfHIST / histSize);
 
 		histImage = new Mat(heightOfHIST, widthOfHIST, CvType.CV_8UC3, new Scalar(0, 0, 0));
-
-		Core.normalize(bHistory, bHistory, 0, histImage.rows(), Core.NORM_MINMAX);
-
-		if (!gray) {
-
-			Core.normalize(gHistory, gHistory, 0, histImage.rows(), Core.NORM_MINMAX);
-
-			Core.normalize(rHistory, rHistory, 0, histImage.rows(), Core.NORM_MINMAX);
-
-		}
+		
+		normHist(histImage.rows());
+		
 
 		float[] bHistData = new float[(int) (bHistory.total() * bHistory.channels())];
 		bHistory.get(0, 0, bHistData);
@@ -315,6 +296,34 @@ public class GUIController {
 		Image hist = matIntoImage(histImage);
 
 		histogram.setImage(hist);
+	}
+	
+	private void splitHistory() {
+		Core.split(frame, histBins);
+		if (histBins.size() > 0) {
+			Imgproc.calcHist(histBins, new MatOfInt(0), new Mat(), bHistory, new MatOfInt(histSize), histRange, false);
+
+			if (!gray) {
+
+				Imgproc.calcHist(histBins, new MatOfInt(1), new Mat(), gHistory, new MatOfInt(histSize), histRange,
+						false);
+
+				Imgproc.calcHist(histBins, new MatOfInt(2), new Mat(), rHistory, new MatOfInt(histSize), histRange,
+						false);
+			}
+		}
+	}
+	
+	public void normHist(int rows) {
+		Core.normalize(bHistory, bHistory, 0, rows, Core.NORM_MINMAX);
+
+		if (!gray) {
+
+			Core.normalize(gHistory, gHistory, 0, histImage.rows(), Core.NORM_MINMAX);
+
+			Core.normalize(rHistory, rHistory, 0, histImage.rows(), Core.NORM_MINMAX);
+
+		}
 	}
 
 	/*
@@ -396,9 +405,11 @@ public class GUIController {
 				biggest = faces;
 
 		Imgproc.rectangle(frame, biggest.tl(), biggest.br(), new Scalar(0, 255, 0), 3);
+		
 
 		if (faceArray.length != 0) {
 			Mat upperprofile = frame.submat(faceArray[0]);
+			System.out.println("face" + biggest.tl().toString());
 			detectEye(upperprofile, faceArray[0]);
 		}
 	}
@@ -453,8 +464,10 @@ public class GUIController {
 				biggest = eyes;
 		}
 
-		if (biggest.area() != 0)
+		if (biggest.area() != 0) {
 			Imgproc.rectangle(upperProfile, biggest.tl(), biggest.br(), new Scalar(255, 0, 0), 3);
-	}
+			System.out.println(biggest.tl().toString());
+			}	
+		}
 
 }
