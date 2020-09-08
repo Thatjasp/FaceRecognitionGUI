@@ -1,1 +1,12 @@
 /* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+
+BorderPane{
+	-fx-background-color: paleGreen;
+}
+Button{
+	-fx-background-color: green;
+	-fx-padding: 5px #000000;
+}
+
+
+	

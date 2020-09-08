@@ -30,9 +30,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public class GUIController {
+	@FXML
 	public ImageView currentFrame;
 	@FXML
 	public Button end_btn;
@@ -42,31 +44,12 @@ public class GUIController {
 	public CheckBox greyScale;
 	@FXML
 	public CheckBox logoBox;
-	@FXML
-	public ImageView histogram;
+
 	@FXML
 	public CheckBox eyeReckingBox;
-
-	// Histogram Data
-	Mat histImage;
-
-	final int widthOfHIST = 512;
-
-	final int heightOfHIST = 500;
-
-	ArrayList<Mat> histBins = new ArrayList<>();
-
-	Mat bHistory = new Mat(), gHistory = new Mat(), rHistory = new Mat();
-
-	float[] range = { 0, 256 };
-
-	MatOfFloat histRange = new MatOfFloat(range);
-
-	int histSize = 256;
-
+	@FXML
+	public HBox hbox;
 	boolean gray = false;
-	// End of Histogram
-
 	// Video Capture/Face Detetcting
 	private CascadeClassifier faceCasc = new CascadeClassifier();
 	private CascadeClassifier eyeCasc = new CascadeClassifier();
@@ -106,6 +89,7 @@ public class GUIController {
 				"resources/haarcascade/haarcascade_righteye_2splits.xml");
 
 		start_btn.setDisable(false);
+		
 
 	}
 
@@ -127,10 +111,6 @@ public class GUIController {
 				@Override
 				public void run() {
 					Image imageToShow = grabFrame();
-					try {
-						histogram();
-					} catch (Exception e) {
-					} // Catches when turn grey
 					currentFrame.setImage(imageToShow);
 
 				}
@@ -250,80 +230,6 @@ public class GUIController {
 
 		}
 
-	}
-
-	/*
-	 * Method that finds the amount RGB in each frame and displays it on the right
-	 */
-	@FXML
-	public void histogram() {
-
-		splitHistory();
-
-		int binWidth = (int) Math.round((double) widthOfHIST / histSize);
-
-		histImage = new Mat(heightOfHIST, widthOfHIST, CvType.CV_8UC3, new Scalar(0, 0, 0));
-		
-		normHist(histImage.rows());
-		
-
-		float[] bHistData = new float[(int) (bHistory.total() * bHistory.channels())];
-		bHistory.get(0, 0, bHistData);
-
-		float[] gHistData = new float[(int) (gHistory.total() * gHistory.channels())];
-		gHistory.get(0, 0, gHistData);
-
-		float[] rHistData = new float[(int) (rHistory.total() * rHistory.channels())];
-		rHistory.get(0, 0, rHistData);
-
-		for (int i = 1; i < histSize; i++) {
-
-			Imgproc.line(histImage, new Point(binWidth * (i - 1), heightOfHIST - Math.round(bHistData[i - 1])),
-					new Point(binWidth * (i), heightOfHIST - Math.round(bHistData[i])), new Scalar(255, 0, 0), 2, 8, 0);
-
-			if (!gray) {
-
-				Imgproc.line(histImage, new Point(binWidth * (i - 1), heightOfHIST - Math.round(gHistData[i - 1])),
-						new Point(binWidth * (i), heightOfHIST - Math.round(gHistData[i])), new Scalar(0, 255, 0), 2, 8,
-						0);
-
-				Imgproc.line(histImage, new Point(binWidth * (i - 1), heightOfHIST - Math.round(rHistData[i - 1])),
-						new Point(binWidth * (i), heightOfHIST - Math.round(rHistData[i])), new Scalar(0, 0, 255), 2, 8,
-						0);
-
-			}
-		}
-		Image hist = matIntoImage(histImage);
-
-		histogram.setImage(hist);
-	}
-	
-	private void splitHistory() {
-		Core.split(frame, histBins);
-		if (histBins.size() > 0) {
-			Imgproc.calcHist(histBins, new MatOfInt(0), new Mat(), bHistory, new MatOfInt(histSize), histRange, false);
-
-			if (!gray) {
-
-				Imgproc.calcHist(histBins, new MatOfInt(1), new Mat(), gHistory, new MatOfInt(histSize), histRange,
-						false);
-
-				Imgproc.calcHist(histBins, new MatOfInt(2), new Mat(), rHistory, new MatOfInt(histSize), histRange,
-						false);
-			}
-		}
-	}
-	
-	public void normHist(int rows) {
-		Core.normalize(bHistory, bHistory, 0, rows, Core.NORM_MINMAX);
-
-		if (!gray) {
-
-			Core.normalize(gHistory, gHistory, 0, histImage.rows(), Core.NORM_MINMAX);
-
-			Core.normalize(rHistory, rHistory, 0, histImage.rows(), Core.NORM_MINMAX);
-
-		}
 	}
 
 	/*
